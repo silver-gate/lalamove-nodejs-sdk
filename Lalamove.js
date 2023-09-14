@@ -125,4 +125,15 @@ module.exports = class Lalamove {
     };
     return this.request(options);
   }
+
+  async getOrderDetails(orderId) {
+    const serviceType = `/orders/${orderId}`;
+    const method = 'GET';
+    const options = {
+      method,
+      url: this.getApiUrl(serviceType),
+      headers: await this.getApiHeaders(method, serviceType),
+    };
+    return this.request(options);
+  }
 };

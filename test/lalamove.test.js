@@ -106,6 +106,14 @@ describe('Lalamove Test', () => {
     expect(order.quotationId).toEqual(quotationId);
     expect(order.status).toEqual('ASSIGNING_DRIVER');
 
+    const { data: orderDetails } = await lalamove.getOrderDetails(order.orderId);
+    console.log(orderDetails);
+    expect(orderDetails.priceBreakdown.total).toEqual('68');
+    expect(orderDetails.priceBreakdown.currency).toEqual('TWD');
+    expect(orderDetails.quotationId).toEqual(quotationId);
+    expect(orderDetails.status).toEqual('ASSIGNING_DRIVER');
+    expect(orderDetails.stops[1].POD.status).toEqual('PENDING');
+
     const response = await lalamove.cancelOrder(order.orderId);
     expect(response).toEqual('');
   });
