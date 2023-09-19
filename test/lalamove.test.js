@@ -72,8 +72,12 @@ describe('Lalamove Test', () => {
     } catch (e) {
       console.log(e);
       expect(quotation).toEqual(undefined);
-      expect(e.message).toEqual(
-        "'2023-09-18T07:46:53.321Z' is not valid 'scheduleAt'. Date cannot be a past date or more than 30 days in advance.",
+      expect(e).toEqual(
+        expect.arrayContaining([expect.objectContaining({
+          id: 'ERR_INVALID_FIELD',
+          detail: '/data/scheduleAt',
+          message: "'2023-09-18T07:46:53.321Z' is not valid 'scheduleAt'. Date cannot be a past date or more than 30 days in advance.",
+        })]),
       );
     }
   });
@@ -123,7 +127,12 @@ describe('Lalamove Test', () => {
     } catch (e) {
       console.log(e);
       expect(quotation).toEqual(undefined);
-      expect(e.message).toEqual('Given latitude/longitude is out of service area.');
+      expect(e).toEqual(
+        expect.arrayContaining([expect.objectContaining({
+          id: 'ERR_OUT_OF_SERVICE_AREA',
+          message: 'Given latitude/longitude is out of service area.',
+        })]),
+      );
     }
   });
 

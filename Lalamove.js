@@ -74,7 +74,7 @@ module.exports = class Lalamove {
         throw new Error(e.response.data.message);
       }
       if (e.response && e.response.data && e.response.data.errors && e.response.data.errors[0]) {
-        throw new Error(e.response.data.errors[0].message);
+        throw e.response.data.errors;
       }
       throw new Error(e.toJSON().message);
     }
