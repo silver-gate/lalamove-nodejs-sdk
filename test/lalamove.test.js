@@ -10,11 +10,10 @@ const {
 } = process.env;
 
 const lalamove = new Lalamove({
-  lalamoveUrl: 'https://rest.sandbox.lalamove.com',
-  version: 'v3',
   apiSecret: API_SECRET,
   apiKey: API_KEY,
   market: MARKET,
+  env: 'sandbox',
 });
 
 jest.setTimeout(30000);

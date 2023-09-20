@@ -5,14 +5,21 @@ const MAX_RETRIES = 2;
 
 module.exports = class Lalamove {
   constructor({
-    lalamoveUrl = 'https://rest.sandbox.lalamove.com',
+    lalamoveUrl,
     version = 'v3',
     apiSecret,
     apiKey,
     market,
+    env = 'production',
     debug,
   }) {
-    this.lalamoveUrl = lalamoveUrl;
+    if (lalamoveUrl) {
+      this.lalamoveUrl = lalamoveUrl;
+    } else if (env === 'production') {
+      this.lalamoveUrl = 'https://rest.lalamove.com';
+    } else {
+      this.lalamoveUrl = 'https://rest.sandbox.lalamove.com';
+    }
     this.version = version;
     this.apiSecret = apiSecret;
     this.apiKey = apiKey;
