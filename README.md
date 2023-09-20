@@ -10,8 +10,6 @@ npm i --save lalamove-nodejs-sdk
 const Lalamove = require('lalamove-nodejs-sdk');
 
 const lalamove = new Lalamove({
-  lalamoveUrl: 'https://rest.sandbox.lalamove.com',
-  version: 'v3',
   apiSecret: YOUR_API_SECRET,
   apiKey: YOUR_API_KEY,
   market: YOUR_MARKET,
