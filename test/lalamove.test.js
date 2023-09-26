@@ -10,11 +10,10 @@ const {
 } = process.env;
 
 const lalamove = new Lalamove({
-  lalamoveUrl: 'https://rest.sandbox.lalamove.com',
-  version: 'v3',
   apiSecret: API_SECRET,
   apiKey: API_KEY,
   market: MARKET,
+  env: 'sandbox',
 });
 
 jest.setTimeout(30000);
@@ -28,6 +27,112 @@ describe('Lalamove Test', () => {
     expect(cityInfo[1].locode).toEqual('TW TNN');
     expect(cityInfo[2].locode).toEqual('TW TPE');
     expect(cityInfo[3].locode).toEqual('TW TXG');
+  });
+
+  test('create a expired quote', async () => {
+    const quotationInput = {
+      data: {
+        scheduleAt: '2023-09-18T07:46:53.321Z',
+        serviceType: 'MOTORCYCLE',
+        language: 'zh_TW',
+        stops: [
+          {
+            coordinates: {
+              lat: '24.995049',
+              lng: '121.433826',
+            },
+            address: '新北市板橋區金門街1號',
+          },
+          {
+            coordinates: {
+              lat: '24.982437',
+              lng: '121.427702',
+            },
+            address: '新北市板橋區溪城路121號',
+          },
+        ],
+        isRouteOptimized: false, // optional only for quotations
+        item: {
+          quantity: '1',
+          weight: 'LESS_THAN_3_KG',
+          categories: [
+            'FOOD_AND_BEVERAGE',
+          ],
+          handlingInstructions: [
+            'KEEP_UPRIGHT',
+          ],
+        },
+      },
+    };
+    let quotation;
+    try {
+      const { data } = await lalamove.createQuotation(quotationInput);
+      quotation = data;
+    } catch (e) {
+      console.log(e);
+      expect(quotation).toEqual(undefined);
+      expect(e).toEqual(
+        expect.arrayContaining([expect.objectContaining({
+          id: 'ERR_INVALID_FIELD',
+          detail: '/data/scheduleAt',
+          message: "'2023-09-18T07:46:53.321Z' is not valid 'scheduleAt'. Date cannot be a past date or more than 30 days in advance.",
+        })]),
+      );
+    }
+  });
+
+  test('create a out out range quote', async () => {
+    const deliveryBy = moment().tz('Asia/Taipei').add(1, 'days').startOf('day')
+      .add(12, 'hours')
+      .toISOString();
+    const quotationInput = {
+      data: {
+        scheduleAt: deliveryBy,
+        serviceType: 'MOTORCYCLE',
+        language: 'zh_TW',
+        stops: [
+          {
+            coordinates: {
+              lat: '24.674703',
+              lng: '120.860649',
+            },
+            address: '苗栗縣竹南鎮海口里10鄰國校前48號',
+          },
+          {
+            coordinates: {
+              lat: '24.599651',
+              lng: '120.835623',
+            },
+            address: '苗栗縣頭屋鄉獅潭村10鄰140號',
+          },
+        ],
+        isRouteOptimized: false, // optional only for quotations
+        item: {
+          quantity: '1',
+          weight: 'LESS_THAN_3_KG',
+          categories: [
+            'FOOD_AND_BEVERAGE',
+          ],
+          handlingInstructions: [
+            'KEEP_UPRIGHT',
+          ],
+        },
+      },
+    };
+    let quotation;
+    try {
+      const { data } = await lalamove.createQuotation(quotationInput);
+      quotation = data;
+    } catch (e) {
+      console.log(e);
+      expect(quotation).toEqual(undefined);
+      expect(e).toEqual(
+        expect.arrayContaining([expect.objectContaining({
+          id: 'ERR_OUT_OF_SERVICE_AREA',
+          message: 'Given latitude/longitude is out of service area.',
+        })]),
+      );
+    }
   });
 
   test('create quote, place order and cancel order', async () => {

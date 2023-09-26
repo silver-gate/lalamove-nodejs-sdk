@@ -5,14 +5,21 @@ const MAX_RETRIES = 2;
 
 module.exports = class Lalamove {
   constructor({
-    lalamoveUrl = 'https://rest.sandbox.lalamove.com',
+    lalamoveUrl,
     version = 'v3',
     apiSecret,
     apiKey,
     market,
+    env = 'production',
     debug,
   }) {
-    this.lalamoveUrl = lalamoveUrl;
+    if (lalamoveUrl) {
+      this.lalamoveUrl = lalamoveUrl;
+    } else if (env === 'production') {
+      this.lalamoveUrl = 'https://rest.lalamove.com';
+    } else {
+      this.lalamoveUrl = 'https://rest.sandbox.lalamove.com';
+    }
     this.version = version;
     this.apiSecret = apiSecret;
     this.apiKey = apiKey;
@@ -73,7 +80,9 @@ module.exports = class Lalamove {
       if (e.response && e.response.data && e.response.data.message) {
         throw new Error(e.response.data.message);
       }
-
+      if (e.response && e.response.data && e.response.data.errors && e.response.data.errors[0]) {
+        throw e.response.data.errors;
+      }
       throw new Error(e.toJSON().message);
     }
   }
